@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circular Flow Matrix Visualization</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .circle {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background-color: rgba(0, 123, 255, 0.5);
+            position: relative;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        .node {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background-color: red;
+            border-radius: 50%;
+            transition: transform 0.2s;
+        }
+    </style>
+</head>
+<body>
+    <div class="circle">
+        <div class="node" style="top: 0; left: 50%; transform: translate(-50%, -50%);"></div>
+        <div class="node" style="top: 50%; left: 100%; transform: translate(-50%, -50%);"></div>
+        <div class="node" style="top: 100%; left: 50%; transform: translate(-50%, -50%);"></div>
+        <div class="node" style="top: 50%; left: 0; transform: translate(-50%, -50%);"></div>
+    </div>
+    <script>
+        const nodes = document.querySelectorAll('.node');
+        nodes.forEach(node => {
+            node.addEventListener('mouseenter', () => {
+                node.style.transform = 'scale(1.5)';
+            });
+            node.addEventListener('mouseleave', () => {
+                node.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>
