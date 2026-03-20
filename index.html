@@ -22,17 +22,17 @@
 
     /* ── Header ─────────────────────────────────────── */
     #header {
-      position: fixed; top: 0; left: 0; right: 0; height: 64px;
+      position: fixed; top: 0; left: 0; right: 0; height: 44px;
       display: flex; align-items: center; justify-content: center; flex-direction: column;
       background: rgba(7,7,26,0.85); backdrop-filter: blur(12px);
       border-bottom: 1px solid rgba(255,255,255,0.08); z-index: 100;
     }
     #header h1 {
-      font-size: 1.4rem; font-weight: 800; letter-spacing: .04em;
+      font-size: 1.05rem; font-weight: 800; letter-spacing: .04em;
       background: linear-gradient(90deg,#00ff88,#ffcc00,#ff6b6b);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }
-    #header .hint { font-size: .7rem; color: #666677; margin-top: 2px; }
+    #header .hint { font-size: .62rem; color: #666677; margin-top: 1px; }
 
     /* ── Main SVG ────────────────────────────────────── */
     #diagram { position: fixed; top: 0; left: 0; width: 100%; height: 100%; overflow: visible; }
@@ -100,38 +100,6 @@
     #flow-popup .fp-label { font-weight: 700; margin-bottom: 4px; }
     #flow-popup .fp-sub   { color: #aaa; font-size: .72rem; }
 
-    /* ── Controls ────────────────────────────────────── */
-    #controls {
-      position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
-      display: flex; gap: 8px; z-index: 100; flex-wrap: wrap; justify-content: center;
-    }
-    .btn {
-      padding: 7px 16px; border: 2px solid; border-radius: 24px;
-      background: transparent; cursor: pointer; font-size: .78rem; font-weight: 700;
-      transition: all .25s; letter-spacing: .03em;
-    }
-    .btn.goods  { border-color: #00ff88; color: #00ff88; }
-    .btn.goods.on  { background: #00ff88; color: #000; box-shadow: 0 0 14px #00ff8899; }
-    .btn.money  { border-color: #ffcc00; color: #ffcc00; }
-    .btn.money.on  { background: #ffcc00; color: #000; box-shadow: 0 0 14px #ffcc0099; }
-    .btn.govt   { border-color: #ff6b6b; color: #ff6b6b; }
-    .btn.govt.on   { background: #ff6b6b; color: #000; box-shadow: 0 0 14px #ff6b6b99; }
-    .btn.pause  { border-color: #8899aa; color: #8899aa; }
-    .btn.pause.on  { background: #8899aa; color: #000; }
-    .btn.reset  { border-color: #7c7cff; color: #7c7cff; }
-    .btn.reset:hover { background: #7c7cff22; }
-
-    /* ── Legend ──────────────────────────────────────── */
-    #legend {
-      position: fixed; left: 18px; top: 76px;
-      background: rgba(10,10,35,.88); border: 1px solid rgba(255,255,255,.1);
-      border-radius: 12px; padding: 14px 16px; z-index: 100; font-size: .76rem;
-    }
-    #legend h4 { color: #555566; margin-bottom: 9px; font-size: .68rem; text-transform: uppercase; letter-spacing: .12em; }
-    .leg { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
-    .leg-line { width: 30px; height: 3px; border-radius: 2px; position: relative; }
-    .leg-line::after { content:'▶'; position: absolute; right:-9px; top:-6px; font-size: 9px; }
-
     /* ── Wheel speed badge ───────────────────────────── */
     #speed-badge {
       position: fixed; right: 18px; bottom: 18px;
@@ -143,13 +111,10 @@
     .speed-dot { width: 8px; height: 8px; border-radius: 50%; }
 
     @media (max-width: 860px) {
-      #legend { display: none; }
       .ecard { min-width: 102px; padding: 9px 12px; }
       .ecard .icon { font-size: 1.3rem; }
       .ecard .name { font-size: .76rem; }
       .ecard .sub  { font-size: .58rem; }
-      #controls { bottom: 12px; }
-      .btn { padding: 6px 12px; font-size: .72rem; }
     }
 
     @media (max-width: 560px) {
@@ -171,7 +136,7 @@
 <!-- Header -->
 <div id="header">
   <h1>🔄 Circular Flow Matrix</h1>
-  <div class="hint">Click any element to explore · Toggle flows below · Follow animated dots to see what flows where</div>
+  <div class="hint">✨ Tap any node · Follow the emoji flow</div>
 </div>
 
 <!-- Main SVG diagram -->
@@ -198,32 +163,6 @@
 <div id="flow-popup">
   <div class="fp-label" id="fp-label"></div>
   <div class="fp-sub" id="fp-sub"></div>
-</div>
-
-<!-- Legend -->
-<div id="legend">
-  <h4>Legend</h4>
-  <div class="leg">
-    <div class="leg-line" style="background:#00ff88;color:#00ff88;"></div>
-    <span style="color:#00ff88;">Goods &amp; Services (↻)</span>
-  </div>
-  <div class="leg">
-    <div class="leg-line" style="background:#ffcc00;color:#ffcc00;"></div>
-    <span style="color:#ffcc00;">Money Flow (↺)</span>
-  </div>
-  <div class="leg">
-    <div class="leg-line" style="background:#ff6b6b;color:#ff6b6b;"></div>
-    <span style="color:#ff6b6b;">Government</span>
-  </div>
-</div>
-
-<!-- Controls -->
-<div id="controls">
-  <button class="btn goods on" id="btn-goods" onclick="toggleLayer('goods')">🏭 Goods &amp; Services</button>
-  <button class="btn money on" id="btn-money" onclick="toggleLayer('money')">💰 Money Flow</button>
-  <button class="btn govt on"  id="btn-govt"  onclick="toggleLayer('govt')">🏛️ Government</button>
-  <button class="btn pause"   id="btn-pause" onclick="togglePause()">⏸ Pause</button>
-  <button class="btn reset"   onclick="resetView()">↺ Reset</button>
 </div>
 
 <!-- Speed badge -->
@@ -344,11 +283,11 @@ const state = {
    ====================================================== */
 function computeLayout() {
   const W = window.innerWidth, H = window.innerHeight;
-  const HDR = 64, CTRL = 58;
+  const HDR = 44, CTRL = 0;
   const availH = H - HDR - CTRL;
   const isCompact = W < 860 || H < 640;
   const govGap = isCompact ? 78 : 92;
-  const topPad = isCompact ? 92 : 108;
+  const topPad = isCompact ? 74 : 88;
   const ringSpace = Math.max(220, availH - topPad);
   const cx = W / 2;
   const cy = HDR + topPad + ringSpace / 2;
@@ -392,6 +331,12 @@ function entityLabel(id) {
 
 function routeLabel(flow) {
   return `${flow.label} · ${entityLabel(flow.from)} → ${entityLabel(flow.to)}`;
+}
+
+function routeEmoji(flow, trail='✨') {
+  const from = ENTITIES[flow.from]?.icon || '⬤';
+  const to = ENTITIES[flow.to]?.icon || '⬤';
+  return `${trail} ${from} → ${to}`;
 }
 
 function addPathPulse(parent, d, color, filterId, dur) {
@@ -451,7 +396,7 @@ function buildSVG() {
   const cg = el('circle',{ cx, cy, r:innerR*0.38, fill:'rgba(100,100,220,0.07)', stroke:'rgba(140,140,255,0.18)', 'stroke-width':'1' });
   bg.appendChild(cg);
   const ct = el('text',{ x:cx, y:cy+5, fill:'rgba(160,160,255,0.55)', 'font-size':'12', 'text-anchor':'middle', 'font-family':'Segoe UI,sans-serif', 'font-weight':'700', class:'no-pe' });
-  ct.textContent='Economy'; bg.appendChild(ct);
+  ct.textContent='🌍'; bg.appendChild(ct);
 
   // ── Layer groups ──
   ['goods','money','govt','particles','labels'].forEach(id => {
@@ -502,7 +447,7 @@ function renderLayers() {
       const a = midAngle(f.from, f.to) * Math.PI / 180;
       const lx = cx + (outerR + 34) * Math.cos(a);
       const ly = cy + (outerR + 34) * Math.sin(a);
-      addFlowLabel(layers.labels, lx, ly, routeLabel(f), '#00ff88');
+      addFlowLabel(layers.labels, lx, ly, routeEmoji(f, '🟢'), '#00ff88');
     });
   }
 
@@ -537,7 +482,7 @@ function renderLayers() {
       const a = midAngle(f.from, f.to) * Math.PI / 180;
       const lx = cx + (innerR - 36) * Math.cos(a);
       const ly = cy + (innerR - 36) * Math.sin(a);
-      addFlowLabel(layers.labels, lx, ly, routeLabel(f), '#ffcc00');
+      addFlowLabel(layers.labels, lx, ly, routeEmoji(f, '🟡'), '#ffcc00');
     });
   }
 
@@ -563,7 +508,7 @@ function renderLayers() {
 
       const lx = (fp.x + tp.x + cpx) / 3;
       const ly = (fp.y + tp.y + cpy) / 3;
-      addFlowLabel(layers.labels, lx, ly, routeLabel(f), '#ff6b6b');
+      addFlowLabel(layers.labels, lx, ly, routeEmoji(f, '🔴'), '#ff6b6b');
     });
   }
 }
@@ -763,7 +708,7 @@ function moveFlowPopup(e) {
   let top = e.clientY - 10;
   if (left + w > window.innerWidth - PAD) left = window.innerWidth - w - PAD;
   if (top + h > window.innerHeight - PAD) top = window.innerHeight - h - PAD;
-  if (top < 70) top = 70;
+  if (top < 54) top = 54;
   if (left < PAD) left = PAD;
   popup.style.left = left + 'px';
   popup.style.top  = top + 'px';
