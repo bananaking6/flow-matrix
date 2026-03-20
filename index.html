@@ -171,7 +171,7 @@
 <!-- Header -->
 <div id="header">
   <h1>🔄 Circular Flow Matrix</h1>
-  <div class="hint">Click any element to explore · Toggle flows below · Hover to highlight connections</div>
+  <div class="hint">Click any element to explore · Toggle flows below · Follow animated dots to see what flows where</div>
 </div>
 
 <!-- Main SVG diagram -->
@@ -386,6 +386,26 @@ function midAngle(fromId, toId) {
   return a + diff / 2;
 }
 
+function entityLabel(id) {
+  return ENTITIES[id] ? ENTITIES[id].name : id;
+}
+
+function routeLabel(flow) {
+  return `${flow.label} · ${entityLabel(flow.from)} → ${entityLabel(flow.to)}`;
+}
+
+function addPathPulse(parent, d, color, filterId, dur) {
+  const pulse = el('circle', { r:'3.4', fill:color, opacity:'0.96', filter:`url(#${filterId})`, class:'no-pe' });
+  const motion = el('animateMotion', {
+    path: d,
+    dur: state.paused ? '99999s' : dur,
+    repeatCount: 'indefinite',
+    rotate: 'auto'
+  });
+  pulse.appendChild(motion);
+  parent.appendChild(pulse);
+}
+
 /* ======================================================
    SVG BUILDING
    ====================================================== */
@@ -474,6 +494,7 @@ function renderLayers() {
       p.addEventListener('mousemove', e => moveFlowPopup(e));
       p.addEventListener('mouseleave', hideFlowPopup);
       g.appendChild(p);
+      addPathPulse(g, trimPath, '#00ff88', 'glow-green', `${8 + i}s`);
     });
 
     // Labels on outer ring midpoints
@@ -481,7 +502,7 @@ function renderLayers() {
       const a = midAngle(f.from, f.to) * Math.PI / 180;
       const lx = cx + (outerR + 34) * Math.cos(a);
       const ly = cy + (outerR + 34) * Math.sin(a);
-      addFlowLabel(layers.labels, lx, ly, f.label, '#00ff88');
+      addFlowLabel(layers.labels, lx, ly, routeLabel(f), '#00ff88');
     });
   }
 
@@ -508,6 +529,7 @@ function renderLayers() {
       p.addEventListener('mousemove', e => moveFlowPopup(e));
       p.addEventListener('mouseleave', hideFlowPopup);
       g.appendChild(p);
+      addPathPulse(g, trimPath, '#ffcc00', 'glow-gold', `${7 + i}s`);
     });
 
     // Labels on inner ring midpoints
@@ -515,7 +537,7 @@ function renderLayers() {
       const a = midAngle(f.from, f.to) * Math.PI / 180;
       const lx = cx + (innerR - 36) * Math.cos(a);
       const ly = cy + (innerR - 36) * Math.sin(a);
-      addFlowLabel(layers.labels, lx, ly, f.label, '#ffcc00');
+      addFlowLabel(layers.labels, lx, ly, routeLabel(f), '#ffcc00');
     });
   }
 
@@ -537,6 +559,11 @@ function renderLayers() {
       p.addEventListener('mousemove', e => moveFlowPopup(e));
       p.addEventListener('mouseleave', hideFlowPopup);
       g.appendChild(p);
+      addPathPulse(g, d, '#ff6b6b', 'glow-red', '9s');
+
+      const lx = (fp.x + tp.x + cpx) / 3;
+      const ly = (fp.y + tp.y + cpy) / 3;
+      addFlowLabel(layers.labels, lx, ly, routeLabel(f), '#ff6b6b');
     });
   }
 }
