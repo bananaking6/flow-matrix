@@ -8,7 +8,10 @@
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      background: #07071a;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(0,255,136,0.09), transparent 38%),
+        radial-gradient(circle at 82% 76%, rgba(255,107,107,0.10), transparent 42%),
+        linear-gradient(160deg, #050513 0%, #07071a 55%, #0b0b25 100%);
       color: #fff;
       font-family: 'Segoe UI', system-ui, sans-serif;
       overflow: hidden;
@@ -40,7 +43,8 @@
       border-radius: 14px; padding: 10px 14px; text-align: center;
       cursor: pointer; border: 2px solid; min-width: 116px;
       backdrop-filter: blur(14px);
-      transition: transform .2s, box-shadow .3s;
+      box-shadow: 0 6px 18px rgba(0,0,0,.35);
+      transition: transform .2s, box-shadow .3s, border-color .2s;
       z-index: 20;
     }
     .ecard:hover { transform: translate(-50%,-50%) scale(1.12); }
@@ -62,7 +66,7 @@
     /* ── Info panel ──────────────────────────────────── */
     #info-panel {
       position: fixed; right: -440px; top: 50%; transform: translateY(-50%);
-      width: 420px; max-height: 82vh; overflow-y: auto;
+      width: min(420px, calc(100vw - 28px)); max-height: 82vh; overflow-y: auto;
       background: rgba(10,10,35,0.97); border: 1px solid rgba(255,255,255,.13);
       border-radius: 18px; padding: 26px; z-index: 300;
       transition: right .4s cubic-bezier(.16,1,.3,1); backdrop-filter: blur(20px);
@@ -137,6 +141,26 @@
     #speed-badge span { display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: .1em; font-size: .65rem; }
     .speed-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
     .speed-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+    @media (max-width: 860px) {
+      #legend { display: none; }
+      .ecard { min-width: 102px; padding: 9px 12px; }
+      .ecard .icon { font-size: 1.3rem; }
+      .ecard .name { font-size: .76rem; }
+      .ecard .sub  { font-size: .58rem; }
+      #controls { bottom: 12px; }
+      .btn { padding: 6px 12px; font-size: .72rem; }
+    }
+
+    @media (max-width: 560px) {
+      .ecard { min-width: 86px; padding: 7px 10px; border-radius: 12px; }
+      .ecard .icon { font-size: 1.05rem; }
+      .ecard .name { font-size: .67rem; margin-top: 1px; }
+      .ecard .sub  { display: none; }
+      #speed-badge { display: none; }
+      #header h1 { font-size: 1.05rem; }
+      #header .hint { font-size: .6rem; }
+    }
 
     /* ── Misc ────────────────────────────────────────── */
     .no-pe { pointer-events: none; }
@@ -322,13 +346,14 @@ function computeLayout() {
   const W = window.innerWidth, H = window.innerHeight;
   const HDR = 64, CTRL = 58;
   const availH = H - HDR - CTRL;
-  // Reserve top space for the Government card (approx 64px tall)
-  const GOV_SPACE = 80;
+  const isCompact = W < 860 || H < 640;
+  const govGap = isCompact ? 78 : 92;
+  const topPad = isCompact ? 92 : 108;
+  const ringSpace = Math.max(220, availH - topPad);
   const cx = W / 2;
-  // Shift the center down slightly to give room for Government at top
-  const cy = HDR + GOV_SPACE + (availH - GOV_SPACE) / 2;
-  const maxR = Math.min(W * 0.37, (availH - GOV_SPACE) * 0.46);
-  const outerR = Math.min(maxR, 195);
+  const cy = HDR + topPad + ringSpace / 2;
+  const maxR = Math.min(W * (isCompact ? 0.32 : 0.37), ringSpace * 0.44);
+  const outerR = Math.min(maxR, isCompact ? 162 : 195);
   const innerR = outerR * 0.54;
   // Angles: 0=right, 90=down, 180=left, 270=up (SVG coords)
   const angles = { households: 180, factorMarket: 270, businesses: 0, productMarket: 90 };
@@ -337,8 +362,8 @@ function computeLayout() {
     const a = ang * Math.PI / 180;
     pos[id] = { x: cx + outerR * Math.cos(a), y: cy + outerR * Math.sin(a) };
   }
-  // Government sits just above the factorMarket node with a comfortable gap
-  const govY = Math.max(HDR + 16, cy - outerR - GOV_SPACE + 10);
+  const factorY = pos.factorMarket.y;
+  const govY = Math.max(HDR + 24, factorY - govGap);
   pos.government = { x: cx, y: govY };
   return { W, H, cx, cy, outerR, innerR, pos, HDR };
 }
@@ -442,6 +467,7 @@ function renderLayers() {
         d: trimPath, fill:'none', stroke:'#00ff88', 'stroke-width':'2.5',
         'marker-end':'url(#arr-green)', opacity:'0.85',
         filter:'url(#glow-green)', class:'flow-arc', 'data-flow':i, 'data-type':'goods',
+        'data-from':f.from, 'data-to':f.to,
         style:'cursor:pointer'
       });
       p.addEventListener('mouseenter', e => showFlowPopup(e, f));
@@ -475,6 +501,7 @@ function renderLayers() {
         d: trimPath, fill:'none', stroke:'#ffcc00', 'stroke-width':'2.5',
         'marker-end':'url(#arr-gold)', opacity:'0.85',
         filter:'url(#glow-gold)', class:'flow-arc', 'data-flow':i, 'data-type':'money',
+        'data-from':f.from, 'data-to':f.to,
         style:'cursor:pointer'
       });
       p.addEventListener('mouseenter', e => showFlowPopup(e, f));
@@ -502,7 +529,9 @@ function renderLayers() {
       const p = el('path', {
         d, fill:'none', stroke:'#ff6b6b', 'stroke-width':'2',
         'stroke-dasharray':'7 5', 'marker-end':'url(#arr-red)',
-        opacity:'0.8', filter:'url(#glow-red)', style:'cursor:pointer'
+        opacity:'0.8', filter:'url(#glow-red)', class:'flow-arc',
+        'data-type':'govt', 'data-from':f.from, 'data-to':f.to,
+        style:'cursor:pointer'
       });
       p.addEventListener('mouseenter', e => showFlowPopup(e, f));
       p.addEventListener('mousemove', e => moveFlowPopup(e));
@@ -674,21 +703,19 @@ function highlightEntity(id) {
   const card = document.getElementById('card-' + id);
   if (card) card.classList.add('active');
 
-  // Dim unrelated flow arcs
   document.querySelectorAll('.flow-arc').forEach(arc => {
-    arc.setAttribute('opacity', '0.18');
+    const from = arc.getAttribute('data-from');
+    const to = arc.getAttribute('data-to');
+    arc.setAttribute('opacity', (from === id || to === id) ? '0.92' : '0.2');
   });
-  // Brighten related arcs
-  const related = [...GOODS_FLOWS, ...MONEY_FLOWS, ...GOVT_FLOWS].filter(f => f.from===id || f.to===id);
-  // We don't have per-arc IDs, so we re-render with highlight
-  // Instead, just restore full opacity on all while entity is active
-  document.querySelectorAll('.flow-arc').forEach(arc => { arc.setAttribute('opacity','0.85'); });
 }
 
 function clearHighlight() {
   if (state.activeId) return; // keep highlight if panel open
   document.querySelectorAll('.ecard').forEach(c => c.classList.remove('active'));
-  document.querySelectorAll('.flow-arc').forEach(arc => { arc.setAttribute('opacity','0.85'); });
+  document.querySelectorAll('.flow-arc').forEach(arc => {
+    arc.setAttribute('opacity', arc.getAttribute('data-type') === 'govt' ? '0.8' : '0.85');
+  });
 }
 
 function showFlowPopup(e, flow) {
@@ -702,8 +729,17 @@ function showFlowPopup(e, flow) {
 }
 function moveFlowPopup(e) {
   const popup = document.getElementById('flow-popup');
-  popup.style.left = (e.clientX + 16) + 'px';
-  popup.style.top  = (e.clientY - 10) + 'px';
+  const PAD = 10;
+  const w = popup.offsetWidth || 230;
+  const h = popup.offsetHeight || 72;
+  let left = e.clientX + 16;
+  let top = e.clientY - 10;
+  if (left + w > window.innerWidth - PAD) left = window.innerWidth - w - PAD;
+  if (top + h > window.innerHeight - PAD) top = window.innerHeight - h - PAD;
+  if (top < 70) top = 70;
+  if (left < PAD) left = PAD;
+  popup.style.left = left + 'px';
+  popup.style.top  = top + 'px';
 }
 function hideFlowPopup() {
   document.getElementById('flow-popup').style.display = 'none';
